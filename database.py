@@ -9,37 +9,31 @@ def _create_database(cursor):
         cursor.execute("CREATE DATABASE IF NOT EXIST{} DEFAULT CHARACTER SET 'utf8'".format(db_name))
         cursor.close()
     except mysql.connector.Error:
-        return {"error":"嘗試建造資料庫，但是失敗"}, 500
+        return {"error":"attempt to build the database"}, 500
 
-def insert_employee(name, gender, age, email):
-    cnx = mysql.connector.connect(user = "root", password = "0000", database = db_name)
+def insert_employee(name, gender, age, email, date, cnx):
     cursor = cnx.cursor()
     
     try:
-        cursor.execute(
-            "INSERT INTO employees (name, gender, age, email) VALUES (%s, %s, %s, %s)", (name, gender, age, email)
-        )
+        cursor.execute("INSERT INTO employee VALUES (?, ?, ?, ?, ?)", (name, gender, age, email, date))
+        cnx.commit()
+        cursor.close()
     except:
-        return {"error":"電子郵件已存在"}, 400
+        return {"error":"email already existed"}, 200
     
-    cnx.commit()
-    cursor.close()
-    cnx.close()
     
-def delete_employee(email):
-    cnx = mysql.connector.connect(user = "root", password = "0000", database = db_name)
+def delete_employee(email, cnx):
     cursor = cnx.cursor()
-    cursor.execute("DELETE FROM employee WHERE email = %s", (email,))
+    cursor.execute("DELETE FROM employee WHERE email = ?", email)
     
     if cursor.rowcount <= 0:
-        return {"error":"員工不存在"}, 400
+        return {"error":"employee not existed"}, 200
     
     cnx.commit()
     cursor.close()
-    cnx.close()
 
-def get_employee():
-    cnx = mysql.connector.connect(user = "root", password = "0000", database = db_name)
+
+def get_employee(cnx):
     cursor = cnx.cursor()
     
     cursor.execute("SELECT * FROM employee")
@@ -62,17 +56,16 @@ def start_database():
         gender VARCHAR(10) NOT NULL,
         age INT NOT NULL,
         email VARCHAR(100) NOT NULL UNIQUE,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);
+        updated_at VARCHAR(100) NOT NULL);
         """
         
         cursor.execute(query)
-
         cursor.close()
-        cnx.close()
+        return cnx
         
     except mysql.connector.Error as error:
         if error.errno == errorcode.ER_BAD_DB_ERROR:
-            #print("沒有資料庫，正在建資料庫")
+            print("沒有資料庫，正在建資料庫")
             _create_database(cursor)
         else:
-            print(f"未知錯誤 {error.errno}")
+            print(f"unknown error {error.errno}")
