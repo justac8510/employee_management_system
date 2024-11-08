@@ -1,29 +1,28 @@
 #import necessary packages
 from flask import Flask, request, jsonify
-import mysql.connector
-from mysql.connector import errorcode
 from datetime import datetime
 import error
 import database as db
+import datetime
+import json
 
 app = Flask(__name__)
-db_name = "employee"
-cnx = db.start_database()
+employees_list = []
 
  
 @app.route('/')
 def index():
-    return "<p></p>"
+    return 
 
-@app.route('/create_employee', methods=['POST'])
-def create_employee():
+@app.route('/creat_employee', methods=['POST'])
+def create_employee(request, response):
     data = request.json
     
     name = data.get('name')
     gender = data.get('gender')
     age = data.get('age')
     email = data.get('email')
-    date = data.get('date')
+    date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
     if not error.check_email_format(email):
         return {"error":"incorrect email format"}, 200
@@ -37,32 +36,28 @@ def create_employee():
     if not error.check_for_name(name):
         return {"error":"incorrect name format"}, 200
     
-    if not error.check_for_date(date):
-        return {"error":"incorrect date format"}, 200
-        
+    employee = {"name":name, "gender": gender, "age": age, "email": email, "update_at": date}
     
-    print("request sent")
-    db.insert_employee(name, gender, age, email, date, cnx)
+    db.insert_employee(json.loads(employee))
     
     return {"message":"successful operation"}, 200
         
 
-@app.route('/delete_employee', methods=['DELETE'])
-def delete_employee():
+@app.route('/del_employee', methods=['DELETE'])
+def delete_employee(request, response):
     data = request.json
     email = data.get('email') #因為email是unique key
     
     if not error.check_email_format(email):
         return {"error":"incorrect internet format"}, 200
     
-    db.delete_employee(email, cnx)
+    db.delete_employee(email)
     
     return {"message":"sucessful operation"}, 200
 
-
-@app.route('/employees', methods=['GET'])
-def get_employees():
-    employees = db.get_employee(cnx)
+@app.route('/update', methods=['GET'])
+def get_employees(request, response):
+    employees = db.get_employee()
     
     if employees:
         return jsonify(employees), 200

@@ -1,18 +1,11 @@
+import re
 
 def check_email_format(email):
-    if type(email) != str:
-        return False
-    
-    if "@" in email:
-        return ".com" in email[email.index("@"):]
-    return False
+    return re.match(r'^[\w\.-]+@[\w\.-]+\.(com)$', email)
 
 def check_for_age(age):
-    if type(age) == int:
-        return 20 <= age and age <= 65
-    else:
-        return False
-    
+    return (20 <= age and age <= 65)
+
 def check_for_name(name):
     return type(name) == str
 
