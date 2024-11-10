@@ -11,7 +11,7 @@ Please replace each parameter values by the following:
 - name: String type
 - gender: male, m, female, f, not case sensitive
 - age: integer value
-- email: must have @ symbol. Before the symbol is the collection of alphabets, numbers, and hyphens (the first character must be alphabets), and after the symbol must include a collection of alphabets and numbers and ends with .com. 
+- email: The identifier must begin with an alphabet and can include a combination of alphabets, numbers, and hyphens. It should be followed by a symbol, after which there must be a sequence of alphabets and numbers, ending with '.com'.
 
 ##### For deleting employee information:
 <code> curl -X DELETE 127.0.0.1:5000/deleteEmployee -H "Content-Type: application/json" -d "{\"employee\":\"<username@example.com>\"}"</code>
