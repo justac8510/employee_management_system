@@ -12,16 +12,28 @@ employees_list = []
  
 @app.route('/')
 def index():
-    return 
+    return "hello"
+    
+@app.route('/employee', methods=['GET'])
+def get_employees():
+    print("print something")
+    employees = db.get_employee()
+    print("print something")
+    
+    if employees:
+        return jsonify(employees), 200
+    else:
+        return jsonify({"message": "no employee"}), 200
 
-@app.route('/creat_employee', methods=['POST'])
-def create_employee(request, response):
+
+@app.route('/creatEmployee', methods=['POST'])
+def create_employee():
     data = request.json
     
-    name = data.get('name')
-    gender = data.get('gender')
-    age = data.get('age')
-    email = data.get('email')
+    name = data.get("name")
+    gender = data.get("gender")
+    age = data.get("age")
+    email = data.get("email")
     date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
     if not error.check_email_format(email):
@@ -37,16 +49,15 @@ def create_employee(request, response):
         return {"error":"incorrect name format"}, 200
     
     employee = {"name":name, "gender": gender, "age": age, "email": email, "update_at": date}
-    
     db.insert_employee(json.loads(employee))
     
     return {"message":"successful operation"}, 200
         
 
-@app.route('/del_employee', methods=['DELETE'])
-def delete_employee(request, response):
+@app.route('/delEmployee', methods=['DELETE'])
+def delete_employee():
     data = request.json
-    email = data.get('email') #因為email是unique key
+    email = data.get("email") #因為email是unique key
     
     if not error.check_email_format(email):
         return {"error":"incorrect internet format"}, 200
@@ -55,14 +66,6 @@ def delete_employee(request, response):
     
     return {"message":"sucessful operation"}, 200
 
-@app.route('/update', methods=['GET'])
-def get_employees(request, response):
-    employees = db.get_employee()
-    
-    if employees:
-        return jsonify(employees), 200
-    else:
-        return jsonify({"message": "no employee"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
