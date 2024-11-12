@@ -20,8 +20,10 @@ def _update_database():
         """
         
         cursor.execute(query)
+        cnx.commit()
         cursor.close()
-        return cnx
+        cnx.close()
+        
         
     except mysql.connector.Error as error:
         if error.errno == errorcode.ER_BAD_DB_ERROR:
@@ -47,8 +49,11 @@ def insert_employee(employee):
         cursor.execute("INSERT INTO employee VALUES (?, ?, ?, ?, ?)", (employee["name"], employee["gender"], employee["age"], employee["email"], employee["update_at"]))
         cnx.commit()
         cursor.close()
+        cnx.close()
     except:
+        cnx.commit()
         cursor.close()
+        cnx.close()
         return {"error":"email already existed"}, 200
     
     
@@ -64,6 +69,8 @@ def delete_employee(email):
     
     cnx.commit()
     cursor.close()
+    cnx.close()
+    
 
 
 def get_employee():
@@ -72,7 +79,9 @@ def get_employee():
     
     cursor.execute("SELECT * FROM employee")
     employees = cursor.fetchall()
+    cnx.commit()
     cursor.close()
+    cnx.close()
     
     return employees
     
