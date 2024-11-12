@@ -11,7 +11,7 @@ employees_list = []
 
 @app.route("/")
 def index():
-    return "<p></p>"
+    return "<p>this is the main page</p>"
     
 @app.route("/employee", methods=['GET'])
 def get_employees():
@@ -43,7 +43,7 @@ def create_employee():
     gender = data["gender"]
     age = data["age"]
     email = data["email"]
-    date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    date = datetime.datetime.now().strftime("%d/%m/%Y")
     
     
     if not error.check_email_format(email):
@@ -58,10 +58,9 @@ def create_employee():
     if not error.check_for_name(name):
         return {"error":"incorrect name format"}, 200
     
-    employee = {"name":name, "gender": gender, "age": age, "email": email, "update_at": date}
+    employee = {"name":name, "gender": gender, "age": age, "email": email, "updated_at": date}
     employees_list.append(employee)
     db.insert_employee(json.dumps(employee))
-    
     return {"message":"successful operation"}, 200
         
 
@@ -79,5 +78,6 @@ def delete_employee():
 
 
 if __name__ == '__main__':
+    db.update_database()
     app.run(debug=True ,port=5000,use_reloader=True)
     

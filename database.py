@@ -1,11 +1,13 @@
 import mysql.connector
 from mysql.connector import errorcode
+import json
+import time, datetime
 
 db_name = "employee"
 
-def _update_database():
+def update_database():
     try:
-        cnx = mysql.connector.connect(user='root', password='0000', database=db_name)
+        cnx = mysql.connector.connect(user='root', password='0000')
         cursor = cnx.cursor()
         cursor.execute("USE {}".format(db_name))
         
@@ -15,8 +17,8 @@ def _update_database():
         name VARCHAR(100) NOT NULL,
         gender VARCHAR(10) NOT NULL,
         age INT NOT NULL,
-        email VARCHAR(100) NOT NULL UNIQUE,
-        updated_at TIMESTAMP NOT NULL;
+        email NVARCHAR(100) NOT NULL UNIQUE,
+        updated_at TIMESTAMP NOT NULL);
         """
         
         cursor.execute(query)
@@ -24,21 +26,11 @@ def _update_database():
         cursor.close()
         cnx.close()
         
-        
     except mysql.connector.Error as error:
-        if error.errno == errorcode.ER_BAD_DB_ERROR:
-            print("no database, creating one...")
-            _create_database(cursor)
-        else:
-            print(f"unknown error {error.errno}")
+        print(f"unknown error {error.errno}")
+        cursor.execute("CREATE DATABASE IF NOT EXISTS {};".format(db_name))
+        return
 
-
-def _create_database(cursor):
-    try:
-        cursor.execute("CREATE DATABASE IF NOT EXIST{} DEFAULT CHARACTER SET 'utf8'".format(db_name))
-        cursor.close()
-    except mysql.connector.Error:
-        return {"error":"attempt to build the database"}, 500
 
 
 def insert_employee(employee):
@@ -46,22 +38,27 @@ def insert_employee(employee):
     cursor = cnx.cursor()
     
     try:
-        cursor.execute("INSERT INTO employee VALUES (?, ?, ?, ?, ?)", (employee["name"], employee["gender"], employee["age"], employee["email"], employee["update_at"]))
+        employee_info = json.loads(employee)
+        updated_at = datetime.datetime.strptime(employee_info["updated_at"], "%d/%m/%Y")
+        
+        query = ("INSERT INTO employee (name, gender, age, email, updated_at)" "VALUES (%s, %s, %s, %s, %s)")
+        employee_info = (employee_info["name"], employee_info["gender"], employee_info["age"], employee_info["email"], updated_at)
+        cursor.execute(query, employee_info)        
+        
         cnx.commit()
         cursor.close()
         cnx.close()
-    except:
+    except mysql.connector.Error as error:
         cnx.commit()
         cursor.close()
         cnx.close()
-        return {"error":"email already existed"}, 200
     
     
 def delete_employee(email):
     cnx = mysql.connector.connect(user='root', password='0000', database=db_name)
     cursor = cnx.cursor()
 
-    cursor.execute("DELETE FROM employee WHERE email = ?", email)
+    cursor.execute("DELETE FROM employee WHERE email = (%s)", email)
     
     if cursor.rowcount <= 0:
         cursor.close()
@@ -87,4 +84,4 @@ def get_employee():
     
     
 if __name__ == "__main__":
-    _update_database()
+    update_database()
