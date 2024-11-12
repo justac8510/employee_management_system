@@ -7,7 +7,8 @@ You can use curl command or Postman to test these API calls. Here are some curl 
 
 Before executing the code, it is recommended to create a virtual enviornment. 
 If we wanted to create a virtual enviornment, executed the following
-<code>python -m venv myenv
+<code>
+python -m venv myenv
 activate myenv
 pip install -r package.txt
 </code>
