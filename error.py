@@ -4,7 +4,7 @@ def check_email_format(email):
     return re.match(r'^[\w\.-]+@[\w\.-]+\.(com)$', email)
 
 def check_for_age(age):
-    return (20 <= age and age <= 65)
+    return (20 >= age and age <= 65)
 
 def check_for_name(name):
     return type(name) == str

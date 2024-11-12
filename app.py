@@ -1,6 +1,6 @@
 #import necessary packages
 from flask import Flask, request, jsonify
-from datetime import datetime
+import datetime
 import error
 import database as db
 import datetime
@@ -9,16 +9,13 @@ import json
 app = Flask(__name__)
 employees_list = []
 
- 
-@app.route('/')
+@app.route("/")
 def index():
-    return "hello"
+    return "<p></p>"
     
-@app.route('/employee', methods=['GET'])
+@app.route("/employee", methods=['GET'])
 def get_employees():
-    print("print something")
     employees = db.get_employee()
-    print("print something")
     
     if employees:
         return jsonify(employees), 200
@@ -26,15 +23,28 @@ def get_employees():
         return jsonify({"message": "no employee"}), 200
 
 
-@app.route('/creatEmployee', methods=['POST'])
+'''
+When creating the api post call, make sure to match the parameter
+
+- name: String type
+- gender: male, m, female, f, not case sensitive
+- age: integer value
+- email: The identifier must begin with an alphabet and can include a combination of alphabets, 
+numbers, and hyphens. It should be followed by a symbol, after which there must be a sequence 
+of alphabets and numbers, ending with '.com'.
+
+'''
+@app.route("/", methods=['POST'])
+@app.route("/createEmployee", methods=['POST'])
 def create_employee():
     data = request.json
     
-    name = data.get("name")
-    gender = data.get("gender")
-    age = data.get("age")
-    email = data.get("email")
-    date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    name = data["name"]
+    gender = data["gender"]
+    age = data["age"]
+    email = data["email"]
+    date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
     
     if not error.check_email_format(email):
         return {"error":"incorrect email format"}, 200
@@ -49,15 +59,16 @@ def create_employee():
         return {"error":"incorrect name format"}, 200
     
     employee = {"name":name, "gender": gender, "age": age, "email": email, "update_at": date}
-    db.insert_employee(json.loads(employee))
+    employees_list.append(employee)
+    db.insert_employee(json.dumps(employee))
     
     return {"message":"successful operation"}, 200
         
 
-@app.route('/delEmployee', methods=['DELETE'])
+@app.route("/delEmployee", methods=['DELETE'])
 def delete_employee():
     data = request.json
-    email = data.get("email") #因為email是unique key
+    email = data["email"] #因為email是unique key
     
     if not error.check_email_format(email):
         return {"error":"incorrect internet format"}, 200
@@ -68,5 +79,5 @@ def delete_employee():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True ,port=5000,use_reloader=True)
     

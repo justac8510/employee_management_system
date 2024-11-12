@@ -5,7 +5,7 @@ db_name = "employee"
 
 def _update_database():
     try:
-        cnx = mysql.connector.connect(database=db_name)
+        cnx = mysql.connector.connect(user='root', password='0000', database=db_name)
         cursor = cnx.cursor()
         cursor.execute("USE {}".format(db_name))
         
@@ -40,7 +40,7 @@ def _create_database(cursor):
 
 
 def insert_employee(employee):
-    cnx = mysql.connector.connect(database=db_name)
+    cnx = mysql.connector.connect(user='root', password='0000', database=db_name)
     cursor = cnx.cursor()
     
     try:
@@ -53,7 +53,7 @@ def insert_employee(employee):
     
     
 def delete_employee(email):
-    cnx = mysql.connector.connect(database=db_name)
+    cnx = mysql.connector.connect(user='root', password='0000', database=db_name)
     cursor = cnx.cursor()
 
     cursor.execute("DELETE FROM employee WHERE email = ?", email)
@@ -67,7 +67,7 @@ def delete_employee(email):
 
 
 def get_employee():
-    cnx = mysql.connector.connect(user = "root", password = "0000")
+    cnx = mysql.connector.connect(user='root', password='0000', database=db_name)
     cursor = cnx.cursor()
     
     cursor.execute("SELECT * FROM employee")
@@ -78,4 +78,4 @@ def get_employee():
     
     
 if __name__ == "__main__":
-    _update_database
+    _update_database()
